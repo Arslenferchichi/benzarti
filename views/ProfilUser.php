@@ -1,22 +1,36 @@
 <?php
-// On prolonge la session
-session_start();
-// On teste si la variable de session existe et contient une valeur
-if(empty($_SESSION['e']))
-{
-    // Si inexistante ou nulle, on redirige vers le formulaire de login
-    header('Location: connexion.php');
-   }
+
+    include_once '../config.php';
+    require '../Model/User.php';
+    include_once '../Controller/UserC.php';
+    session_start();
+    $userC = new UserC();
+  //  if (isset($_SESSION['username'])) {
+        if ($_SESSION['type'] == "user") {
+           $user = $userC->getuserID($_SESSION['id']);
+       // }
+    } else {
+        header('Location:login.php');
+    }
+    if ( isset($_POST['email']) && isset($_POST['password']) && isset($_POST['id']) && isset($_POST['type']) && isset($_POST['etat']) && isset($_POST['nationalite']) && isset($_POST['numerotele']) && isset($_POST['sexe']) ) {
+    
+        
+
+        $utilisateur = new user($_POST['email'],$_POST['username'],$_POST['password'],$_POST['type'],$_POST['numerotele'],$_POST['nationalite'],$_POST['sexe'],$_POST['etat']);
+        $utilisateurC = new UserC();
+        $utilisateurC->modifier_Utilisateur($utilisateur,$_POST['id']);
+    }
 ?>
+
 <!DOCTYPE html>
-<html lang="fr">
-<html lang="fr">
+<html lang="en">
+
 <head>
-<title>Tayarni eCommerce</title>
+    <title>Tayarni eCommerce</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="apple-touch-icon" href="../assets/img/logo.gif">
+    <link rel="apple-touch-icon" href="assets/img/logo.gif">
     <link rel="shortcut icon" type="image/x-icon" href="assets/img/logo.gif">
 
     <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
@@ -34,8 +48,10 @@ https://templatemo.com/tm-559-zay-shop
 
 -->
 </head>
+
 <body>
-<nav class="navbar navbar-expand-lg bg-dark navbar-light d-none d-lg-block" id="templatemo_nav_top">
+    <!-- Start Top Nav -->
+    <nav class="navbar navbar-expand-lg bg-dark navbar-light d-none d-lg-block" id="templatemo_nav_top">
         <div class="container text-light">
             <div class="w-100 d-flex justify-content-between">
                 <div>
@@ -53,6 +69,8 @@ https://templatemo.com/tm-559-zay-shop
             </div>
         </div>
     </nav>
+    <!-- Close Top Nav -->
+
 
     <!-- Header -->
     <nav class="navbar navbar-expand-lg navbar-light shadow">
@@ -71,7 +89,7 @@ https://templatemo.com/tm-559-zay-shop
                 <div class="flex-fill">
                     <ul class="nav navbar-nav d-flex justify-content-between mx-lg-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="index.html">Acceuil</a>
+                            <a class="nav-link" href="../index.php">Acceuil</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="about.html">Location</a>
@@ -98,41 +116,67 @@ https://templatemo.com/tm-559-zay-shop
                                 <i class="fa fa-fw fa-search"></i>
                             </div>
                         </div>
-                    </div>
-                    <a class="nav-icon d-none d-lg-inline" href="#" data-bs-toggle="modal" data-bs-target="#templatemo_search">
-                        <i class="fa fa-fw fa-search text-dark mr-2"></i>
-                    </a>
-                    <a class="nav-icon position-relative text-decoration-none" href="#">
-                        <i class="fa fa-fw fa-cart-arrow-down text-dark mr-1"></i>
-                        <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark">7</span>
-                    </a>
-                    <a class="nav-icon position-relative text-decoration-none" href="#">
-                        <i class="fa fa-fw fa-user text-dark mr-3"></i>
-                        <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark">+99</span>
-                    </a>
+</div>
+                    <a href="profilUser.php"class="text-decoration-none">
+                    <?php
+echo 'Bienvenue ', $_SESSION['username'];
+?>                    </a>
+                    <button class="btn btn-light btn-icon-text"><a href="deconnexion.php"class="text-decoration-none">Déconnecter</a></button>
                 </div>
             </div>
 
         </div>
     </nav>
 
+    <br><br>
 
-<body>
-<button><a href="deconnexion.php">Déconnecter</a></button>
-<hr>
-<?php
-// Il est bien connecté
-require '../Controller/UtilisateurC.php';
-                        
-$UserC = new UtilisateurC();
-$User = $UserC->afficherUtilisateurs();
-echo 'Bienvenue Utilisateur ', $_SESSION['e'];
 
-?>
-                        
-<button><a href="modifierUser.php?id=<?php echo $_SESSION['id'];?>">modifier</a></button>
+        <h1>Profile</h1>
+        <h4>My infos</h4>
+        <form action="" method="POST" class="forms-sample">
+            <table>
+                <input type="hidden" name="id" value="<?php echo $_SESSION['id'] ?>">
+            <tr>
+            <div class="form-group"><td> <label for="password" >password</label> </td><td> <input type="password" name="password" value="<?php echo $user['password'] ?>">    </td>
+            </div>    
+        </tr>
+               <tr> <td><div class="form-group"><label for="username">Nom d'utilisateur:</label>  </td><td>
+                    <input type="text" name="username" value="<?php echo $user['username'] ?>"> </div></td>
+                </tr>
 
-<br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+                   <tr><td> <div class="form-group"><label for="email">email:</label> </td>
+                   <td> <input type="text" name="email" value="<?php echo $user['email'] ?>"> </div> </td> </tr>
+
+                   <tr><td>
+                    <div class="form-group"><label for="type">type</label> </td><td> 
+                    <input type="text" name="type" value="<?php echo $user['type'] ?>"> </div>
+                    </td></tr>
+                    <tr><td>
+                    <div class="form-group"><label for="numerotele">num telephone:</label> </td> <td> 
+                    <input type="text" name="numerotele" value="<?php echo $user['numerotele'] ?>"> </div>
+                    </td></tr>
+
+                    <tr><td>
+                    <div class="form-group"><label for="nationalite">nationalite :</label>  </td> <td>
+                    <input type="text" name="nationalite" value="<?php echo $user['nationalite'] ?>"> </div>
+                    </td></tr>
+
+                    <tr><td>
+                    <div class="form-group"><label for="sexe">sexe:</label>  </td> <td>
+                    <input type="text" name="sexe" value="<?php echo $user['sexe'] ?>"> </div>
+                    </td></tr>
+                    <tr><td>
+                    <div class="form-group"><label for="etat">etat:</label> </td> <td> 
+                    <input type="text" name="etat" value="<?php echo $user['etat'] ?>"> </div>
+                    </td></tr>
+                    <button type="submit" class="btn btn-primary btn-icon-text">
+                          Edit
+                          <i class="ti-file btn-icon-append"></i>                          
+                        </button>
+            </table>
+            <br><br>            
+
+<!-- Start Footer -->
 <footer class="bg-dark" id="tempaltemo_footer">
         <div class="container">
             <div class="row">
@@ -227,4 +271,5 @@ echo 'Bienvenue Utilisateur ', $_SESSION['e'];
     <script src="assets/js/custom.js"></script>
     <!-- End Script -->
 </body>
+
 </html>
